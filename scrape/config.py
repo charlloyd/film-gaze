@@ -1,8 +1,9 @@
 # external links, package imports, file paths etc.
+import os
 
-### CSV OUTPUT DIRECTORY
+### CSV FILE DIRECTORY
 
-csv_output_dir = '/Users/Char/Desktop/'
+csv_dir = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..', 'files'))
 
 ### BFI URL
 

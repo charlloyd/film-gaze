@@ -58,21 +58,15 @@ def scrape_bfi_voters():
             voters_list.append(voter_info)
             print voter_info
 
-            # write voter info to csv
-            with open(csv_output_dir+'voters.csv', 'wb') as f:
-                writer = csv.writer(f)
-                writer.writerows(voters_list)
-                f.close()
+        # write voter info to csv
+        with open(csv_dir+'/bfi-voters.csv', 'wb') as f:
+            writer = csv.writer(f)
+            writer.writerows(voters_list)
+            f.close()
 
     return voters_list, filmid_manual_dict
 
 def scrape_bfi_films(voters_list, filmid_manual_dict):
-
-    # get list of unique film ids
-    filmid_list = []
-    for i in voters_list:
-        for j in i[5:-1]: filmid_list.append(j)
-    filmid_list = set(filmid_list)
 
     # initialize lists of films with header labels
     film_list = [['filmid', 'title', 'director', 'country', 'year', 'genre', 'type', 'category']]
@@ -81,9 +75,15 @@ def scrape_bfi_films(voters_list, filmid_manual_dict):
     for k,v in filmid_manual_dict.iteritems():
         film_list.append([v[0], k, v[2], '', v[1], '', '', ''])
 
+    # get list of unique filmids from voter_list
+    filmid_list = []
+    for i in voters_list:
+        for j in i[5:-1]: filmid_list.append(j)
+    filmid_list = set(filmid_list)
+
     # visit each of the film webpages
     for filmid in filmid_list:
-        if filmid[0] == 'f': continue
+        if str(filmid)[0] != '4': continue
         film_soup = BeautifulSoup(urllib2.urlopen('http://www.bfi.org.uk/films-tv-people/'+str(filmid)).read(), 'html5lib')
 
         # extract film title and append with film id
@@ -114,7 +114,7 @@ def scrape_bfi_films(voters_list, filmid_manual_dict):
         print film_info
 
         # write film info to csv
-        with open(csv_output_dir+'films.csv', 'wb') as f:
+        with open(csv_dir+'/bfi-films.csv', 'wb') as f:
             writer = csv.writer(f)
             writer.writerows(film_list)
             f.close()

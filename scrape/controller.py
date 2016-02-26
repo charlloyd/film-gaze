@@ -1,5 +1,5 @@
 # run main functions from other packages here
-from config import *
+
 from bfiscrape import *
 
 voters_list, filmid_manual_dict = scrape_bfi_voters()
