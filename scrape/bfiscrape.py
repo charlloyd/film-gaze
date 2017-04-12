@@ -16,8 +16,7 @@ def scrape_bfi_voters():
     filmid_manual_dict = {}
 
     # open main BFI voters page and extract the tables with lists of voters
-    pagehtml = requests.get(bfi_url)
-    bfi_soup = BeautifulSoup(pagehtml.content, 'html5lib')
+    bfi_soup = BeautifulSoup(requests.get(bfi_url).content, 'html5lib')
     tables = bfi_soup.findAll('table', attrs= {'class':'sas-poll'})
     bfi_soup.decompose()
 
@@ -27,23 +26,23 @@ def scrape_bfi_voters():
         for tr in trs:
 
             # extract voterid and save link
-            voter_link = tr.find('a').get('href').encode('utf8')
-            voter_info = [voter_link.split('/')[-1].encode('utf8')]
+            voter_url = tr.find('a').get('href')
+            voter_info = [voter_url.split('/')[-1]]
 
             # extract voter name, type, country, and gender
-            voter_info.extend([val.text.encode('utf8') for val in tr.findAll('td')])
+            voter_info.extend([cell.text for cell in tr.findAll('td')])
 
             # open voter page
-            voter_soup = BeautifulSoup(urllib2.urlopen(voter_link).read(), 'html5lib')
+            voter_soup = BeautifulSoup(requests.get(voter_url).content, 'html5lib')
             film_table = voter_soup.find('table', attrs= {'class':'sas-poll'})
 
             # extract ten filmids
             for tr in film_table.findAll('tr'):
                 try:
                     link = tr.findNext('td').findNext('p').find('a')
-                    voter_info.append(link.get('href').split('/')[-1].encode('utf8'))
+                    voter_info.append(link.get('href').split('/')[-1])
                 except:
-                    filmid_manual_info = [val.text.encode('utf8') for val in tr.findAll('td')]
+                    filmid_manual_info = [cell.text for cell in tr.findAll('td')]
                     if filmid_manual_info[0] in filmid_manual_dict:
                         voter_info.append(filmid_manual_dict.get(filmid_manual_info[0])[0])
                     else:
@@ -52,15 +51,18 @@ def scrape_bfi_voters():
                         filmid_manual += 1
 
             # extract voter comment
-            voter_info.append(clean_html(str(voter_soup.find('div', attrs= {'class':'wysiwyg'}))))
-
+            try:
+                voter_info.append(str(voter_soup.find('div', attrs= {'class':'wysiwyg'}).get_text()).strip())
+            except:
+                voter_info.append('')
+                
             # append info on this single voter to the list of all voters
             voter_soup.decompose()
-            voters_list.append(voter_info)
+            voters_list.append([str(i).encode('utf8') for i in voter_info])
             print(voter_info)
 
         # write voter info to csv
-        with open(csv_dir+'/bfi-voters.csv', 'wb') as f:
+        with open(csv_dir+'/bfi-voters.csv', 'w') as f:
             writer = csv.writer(f)
             writer.writerows(voters_list)
             f.close()
