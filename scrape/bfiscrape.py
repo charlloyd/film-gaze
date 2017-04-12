@@ -30,7 +30,7 @@ def scrape_bfi_voters():
             voter_info = [voter_url.split('/')[-1]]
 
             # extract voter name, type, country, and gender
-            voter_info.extend([cell.text.encode('utf8') for cell in tr.findAll('td')])
+            voter_info.extend([cell.text.encode('UTF-8') for cell in tr.findAll('td')])
 
             # open voter page
             voter_soup = BeautifulSoup(requests.get(voter_url).content, 'html5lib')
@@ -52,7 +52,7 @@ def scrape_bfi_voters():
 
             # extract voter comment
             try:
-                voter_info.append(voter_soup.find('div', attrs= {'class':'wysiwyg'}).get_text().strip().encode('utf8'))
+                voter_info.append(voter_soup.find('div', attrs= {'class':'wysiwyg'}).get_text().strip().encode('UTF-8'))
             except:
                 voter_info.append('')
                 
@@ -62,7 +62,7 @@ def scrape_bfi_voters():
             print(voter_info)
 
         # write voter info to csv
-        with open(csv_dir+'/bfi-voters.csv', 'w', encoding='UTF-8') as f:
+        with open(csv_dir+'/bfi-voters.csv', 'w', newline='') as f:
             writer = csv.writer(f)
             writer.writerows(voters_list)
             f.close()
@@ -76,7 +76,7 @@ def scrape_bfi_films(voters_list, filmid_manual_dict):
 
     # add manual filmids to list
     for k,v in filmid_manual_dict.items():
-        film_list.append([v[0], k, v[2], '', v[1], '', '', ''])
+        film_list.append([v[0], k.encode('UTF-8'), v[2].encode('UTF-8'), '', v[1].encode('UTF-8'), '', '', ''])
 
     # get list of unique filmids from voter_list
     filmid_list = []
@@ -90,24 +90,24 @@ def scrape_bfi_films(voters_list, filmid_manual_dict):
         film_soup = BeautifulSoup(requests.get(film_url+str(filmid)).content, 'html5lib')
 
         # extract film title and append with film id
-        film_info = [filmid, film_soup.find('title').contents[0].split('(')[0].strip().encode('utf8')]
+        film_info = [filmid, film_soup.find('title').contents[0].split('(')[0].strip().encode('UTF-8')]
 
         # extract director(s)
         try:
-            film_info.append(" & ".join([director.text.encode('utf8') for director in film_soup.find('p', text=re.compile('Director.*'), attrs={'class':'row-label'}).findNext('p').findAll('a')]))
+            film_info.append(" & ".join([director.text.encode('UTF-8') for director in film_soup.find('p', text=re.compile('Director.*'), attrs={'class':'row-label'}).findNext('p').findAll('a')]))
         except:
             film_info.append('')
 
         # extract country(ies)
         try:
-            film_info.append(" & ".join([country.text.encode('utf8') for country in film_soup.find('p', text=re.compile('Countr.*'), attrs={'class':'row-label'}).findNext('p').findAll('span')]))
+            film_info.append(" & ".join([country.text.encode('UTF-8') for country in film_soup.find('p', text=re.compile('Countr.*'), attrs={'class':'row-label'}).findNext('p').findAll('span')]))
         except:
             film_info.append('')
 
         # extract year, genre, type, and category
         for k in ['Year', 'Genre', 'Type', 'Category']:
             try:
-                film_info.append(film_soup.find('p', text=k, attrs={'class':'row-label'}).findNext('p').find('span').contents[0].encode('utf8'))
+                film_info.append(film_soup.find('p', text=k, attrs={'class':'row-label'}).findNext('p').find('span').contents[0].encode('UTF-8'))
             except:
                 film_info.append('')
 
@@ -116,10 +116,10 @@ def scrape_bfi_films(voters_list, filmid_manual_dict):
         film_list.append(film_info)
         print(film_info)
 
-        # write film info to csv
-        with open(csv_dir+'/bfi-films.csv', 'w', encoding='UTF-8') as f:
-            writer = csv.writer(f)
-            writer.writerows(film_list)
-            f.close()
+    # write film info to csv
+    with open(csv_dir+'/bfi-films.csv', 'w', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerows(film_list)
+        f.close()
 
     return film_list

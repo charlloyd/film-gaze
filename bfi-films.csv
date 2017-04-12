@@ -1,5 +1,5 @@
 filmid,title,director,country,year,genre,type,category
-1000,Histoire(s) du cinéma,Jean-Luc Godard,,,,,
+1000,b'Histoire(s) du cin\xc3\xa9ma',b'Jean-Luc Godard',,b'',,,
 4ce2b6b41d658,b'La R\xc3\xa8gle du jeu',,,b'1939',b'Drama',b'Film',b'Fiction'
 4ce2b6b7568ee,b'Sunrise  A Song of Two Humans',,,b'1927',b'Drama',b'Film',b'Fiction'
 4ce2b6bfd1ebb,b'\xc3\x80 bout de souffle',,,b'1960',b'Film noir',b'Film',b'Fiction'
