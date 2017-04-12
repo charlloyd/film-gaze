@@ -16,12 +16,12 @@ def scrape_bfi_voters():
     filmid_manual_dict = {}
 
     # open main BFI voters page and extract the tables with lists of voters
-    bfi_soup = BeautifulSoup(requests.get(bfi_url).content, 'html5lib')
+    bfi_soup = BeautifulSoup(requests.get(voterlist_url).content, 'html5lib')
     tables = bfi_soup.findAll('table', attrs= {'class':'sas-poll'})
     bfi_soup.decompose()
 
     # parse through each voter (under a distinct <tr> tag)
-    for table in tables:
+    for table in tables[24:]:
         trs = table.findAll('tr')
         for tr in trs:
 
@@ -30,7 +30,7 @@ def scrape_bfi_voters():
             voter_info = [voter_url.split('/')[-1]]
 
             # extract voter name, type, country, and gender
-            voter_info.extend([cell.text for cell in tr.findAll('td')])
+            voter_info.extend([cell.text.encode('utf8') for cell in tr.findAll('td')])
 
             # open voter page
             voter_soup = BeautifulSoup(requests.get(voter_url).content, 'html5lib')
@@ -52,17 +52,17 @@ def scrape_bfi_voters():
 
             # extract voter comment
             try:
-                voter_info.append(str(voter_soup.find('div', attrs= {'class':'wysiwyg'}).get_text()).strip())
+                voter_info.append(voter_soup.find('div', attrs= {'class':'wysiwyg'}).get_text().strip().encode('utf8'))
             except:
                 voter_info.append('')
                 
             # append info on this single voter to the list of all voters
             voter_soup.decompose()
-            voters_list.append([str(i).encode('utf8') for i in voter_info])
+            voters_list.append(voter_info)
             print(voter_info)
 
         # write voter info to csv
-        with open(csv_dir+'/bfi-voters.csv', 'w') as f:
+        with open(csv_dir+'/bfi-voters.csv', 'w', encoding='UTF-8') as f:
             writer = csv.writer(f)
             writer.writerows(voters_list)
             f.close()
@@ -75,19 +75,19 @@ def scrape_bfi_films(voters_list, filmid_manual_dict):
     film_list = [['filmid', 'title', 'director', 'country', 'year', 'genre', 'type', 'category']]
 
     # add manual filmids to list
-    for k,v in filmid_manual_dict.iteritems():
+    for k,v in filmid_manual_dict.items():
         film_list.append([v[0], k, v[2], '', v[1], '', '', ''])
 
     # get list of unique filmids from voter_list
     filmid_list = []
-    for i in voters_list:
+    for i in voters_list[:2]:
         for j in i[5:-1]: filmid_list.append(j)
     filmid_list = set(filmid_list)
 
     # visit each of the film webpages
     for filmid in filmid_list:
         if str(filmid)[0] != '4': continue
-        film_soup = BeautifulSoup(urllib2.urlopen('http://www.bfi.org.uk/films-tv-people/'+str(filmid)).read(), 'html5lib')
+        film_soup = BeautifulSoup(requests.get(film_url+str(filmid)).content, 'html5lib')
 
         # extract film title and append with film id
         film_info = [filmid, film_soup.find('title').contents[0].split('(')[0].strip().encode('utf8')]
@@ -117,7 +117,7 @@ def scrape_bfi_films(voters_list, filmid_manual_dict):
         print(film_info)
 
         # write film info to csv
-        with open(csv_dir+'/bfi-films.csv', 'wb') as f:
+        with open(csv_dir+'/bfi-films.csv', 'w', encoding='UTF-8') as f:
             writer = csv.writer(f)
             writer.writerows(film_list)
             f.close()

@@ -7,4 +7,5 @@ csv_dir = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..'))
 
 ### BFI URL
 
-bfi_url = "http://www.bfi.org.uk/films-tv-people/sightandsoundpoll2012/voters"
+voterlist_url = 'http://www.bfi.org.uk/films-tv-people/sightandsoundpoll2012/voters'
+film_url = 'http://www.bfi.org.uk/films-tv-people/'
