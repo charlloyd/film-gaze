@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 import csv
 from nltk import clean_html
 import re
-import urllib2
+import requests
 
 def scrape_bfi_voters():
 
@@ -16,7 +16,8 @@ def scrape_bfi_voters():
     filmid_manual_dict = {}
 
     # open main BFI voters page and extract the tables with lists of voters
-    bfi_soup = BeautifulSoup(urllib2.urlopen(bfi_url).read(), 'html5lib')
+    pagehtml = requests.get(bfi_url)
+    bfi_soup = BeautifulSoup(pagehtml.content, 'html5lib')
     tables = bfi_soup.findAll('table', attrs= {'class':'sas-poll'})
     bfi_soup.decompose()
 
@@ -56,7 +57,7 @@ def scrape_bfi_voters():
             # append info on this single voter to the list of all voters
             voter_soup.decompose()
             voters_list.append(voter_info)
-            print voter_info
+            print(voter_info)
 
         # write voter info to csv
         with open(csv_dir+'/bfi-voters.csv', 'wb') as f:
@@ -111,7 +112,7 @@ def scrape_bfi_films(voters_list, filmid_manual_dict):
         # append info on this single film to the list of all films
         film_soup.decompose()
         film_list.append(film_info)
-        print film_info
+        print(film_info)
 
         # write film info to csv
         with open(csv_dir+'/bfi-films.csv', 'wb') as f:
