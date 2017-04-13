@@ -5,6 +5,7 @@ import csv
 from nltk import clean_html
 import re
 import requests
+import pandas as pd
 
 def scrape_bfi_voters():
 
@@ -61,6 +62,9 @@ def scrape_bfi_voters():
             voters_list.append(voter_info)
             print(voter_info)
 
+        df = pd.DataFrame(voters_list)
+        df.to_csv(csv_dir+'/bfi-voters2.csv', sep=',', encoding='utf-8')
+        
         # write voter info to csv
         with open(csv_dir+'/bfi-voters.csv', 'w', newline='') as f:
             writer = csv.writer(f)
@@ -94,13 +98,13 @@ def scrape_bfi_films(voters_list, filmid_manual_dict):
 
         # extract director(s)
         try:
-            film_info.append(" & ".join([director.text.encode('UTF-8') for director in film_soup.find('p', text=re.compile('Director.*'), attrs={'class':'row-label'}).findNext('p').findAll('a')]))
+            film_info.append(" & ".join([director.text for director in film_soup.find('p', text=re.compile('Director.*'), attrs={'class':'row-label'}).findNext('p').findAll('a')]).encode('UTF-8'))
         except:
             film_info.append('')
 
         # extract country(ies)
         try:
-            film_info.append(" & ".join([country.text.encode('UTF-8') for country in film_soup.find('p', text=re.compile('Countr.*'), attrs={'class':'row-label'}).findNext('p').findAll('span')]))
+            film_info.append(" & ".join([country.text for country in film_soup.find('p', text=re.compile('Countr.*'), attrs={'class':'row-label'}).findNext('p').findAll('span')]).encode('UTF-8'))
         except:
             film_info.append('')
 
@@ -117,6 +121,7 @@ def scrape_bfi_films(voters_list, filmid_manual_dict):
         print(film_info)
 
     # write film info to csv
+    
     with open(csv_dir+'/bfi-films.csv', 'w', newline='') as f:
         writer = csv.writer(f)
         writer.writerows(film_list)

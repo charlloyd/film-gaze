@@ -3,7 +3,7 @@ import os
 
 ### CSV FILE DIRECTORY
 
-csv_dir = os.path.abspath(os.path.join(os.path.dirname( __file__ ), '..'))
+csv_dir = os.path.abspath((os.path.dirname( __file__ )))
 
 ### BFI URL
 
