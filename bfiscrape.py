@@ -22,7 +22,7 @@ def scrape_bfi_voters():
     bfi_soup.decompose()
 
     # parse through each voter (under a distinct <tr> tag)
-    for table in tables[24:]:
+    for table in tables:
         trs = table.findAll('tr')
         for tr in trs:
 
@@ -84,7 +84,7 @@ def scrape_bfi_films(voters_list, filmid_manual_dict):
 
     # get list of unique filmids from voter_list
     filmid_list = []
-    for i in voters_list[:2]:
+    for i in voters_list:
         for j in i[5:-1]: filmid_list.append(j)
     filmid_list = set(filmid_list)
 
