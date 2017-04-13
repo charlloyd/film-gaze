@@ -1,11 +1,9 @@
 from config import *
 
 from bs4 import BeautifulSoup
-import csv
-from nltk import clean_html
-import re
 import requests
-import pandas as pd
+import csv
+import re
 
 def scrape_bfi_voters():
 
@@ -61,12 +59,9 @@ def scrape_bfi_voters():
             voter_soup.decompose()
             voters_list.append(voter_info)
             print(voter_info)
-
-        df = pd.DataFrame(voters_list)
-        df.to_csv(csv_dir+'/bfi-voters2.csv', sep=',', encoding='utf-8')
         
         # write voter info to csv
-        with open(csv_dir+'/bfi-voters.csv', 'w', newline='') as f:
+        with open(csv_dir+'/bfi-voters.csv', 'w', newline='', encoding='utf-8') as f:
             writer = csv.writer(f)
             writer.writerows(voters_list)
             f.close()
@@ -122,7 +117,7 @@ def scrape_bfi_films(voters_list, filmid_manual_dict):
 
     # write film info to csv
     
-    with open(csv_dir+'/bfi-films.csv', 'w', newline='') as f:
+    with open(csv_dir+'/bfi-films.csv', 'w', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
         writer.writerows(film_list)
         f.close()
