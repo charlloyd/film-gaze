@@ -15,7 +15,7 @@ def scrape_bfi_voters():
     filmid_manual_dict = {}
 
     # open main BFI voters page and extract the tables with lists of voters
-    bfi_soup = BeautifulSoup(requests.get(voterlist_url).content, 'html5lib')
+    bfi_soup = BeautifulSoup(requests.get(voterlist_url).content, ‘lxml’)
     tables = bfi_soup.findAll('table', attrs= {'class':'sas-poll'})
     bfi_soup.decompose()
 
@@ -32,7 +32,7 @@ def scrape_bfi_voters():
             voter_info.extend([cell.text.encode('UTF-8') for cell in tr.findAll('td')])
 
             # open voter page
-            voter_soup = BeautifulSoup(requests.get(voter_url).content, 'html5lib')
+            voter_soup = BeautifulSoup(requests.get(voter_url).content, ‘lxml’)
             film_table = voter_soup.find('table', attrs= {'class':'sas-poll'})
 
             # extract ten filmids
@@ -86,7 +86,7 @@ def scrape_bfi_films(voters_list, filmid_manual_dict):
     # visit each of the film webpages
     for filmid in filmid_list:
         if str(filmid)[0] != '4': continue
-        film_soup = BeautifulSoup(requests.get(film_url+str(filmid)).content, 'html5lib')
+        film_soup = BeautifulSoup(requests.get(film_url+str(filmid)).content, ‘lxml’)
 
         # extract film title and append with film id
         film_info = [filmid, film_soup.find('title').contents[0].split('(')[0].strip().encode('UTF-8')]
